@@ -10,4 +10,4 @@ services:
     ports:
       - "8789:8789"
     volumes:
-      - ./research:/playground
+      - ./:/playground
