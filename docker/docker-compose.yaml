@@ -1,7 +1,7 @@
 services:
   db:
     restart: always
-    image: postgres
+    image: postgres:16
     container_name: mlflow_db
     ports:
       - "5423:5432"
@@ -10,15 +10,15 @@ services:
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DATABASE: ${PG_DATABASE}
+      POSTGRES_DB: ${PG_DATABASE}
     volumes:
-      - ./db_data:/var/lib/postgresql/
+      - ./db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-p", "5432", "-U", "${PG_USER}"]
+      test: ["CMD", "pg_isready", "-U", "${PG_USER}"]
       interval: 5s
       timeout: 5s
       retries: 3
-  
+
   s3:
     restart: always
     image: minio/minio:RELEASE.2024-07-31T05-46-26Z
@@ -36,28 +36,28 @@ services:
     volumes:
       - ./minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/minio/health/live"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
 
   s3_setup:
     image: minio/mc:RELEASE.2024-08-13T05-33-17Z
     container_name: s3_setup
     depends_on:
-      - s3
+      s3:
+        condition: service_healthy
     networks:
       - backend
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     entrypoint: ["/bin/sh", "-c"]
-    command: 
-      - |
-        mc alias set myminio http://s3:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
-        mc admin user svcacct add --access-key ${MLFLOW_AWS_ACCESS_KEY_ID} --secret-key ${MLFLOW_AWS_SECRET_ACCESS_KEY} myminio ${MINIO_ROOT_USER}
-        mc mb myminio/${MLFLOW_BUCKET_NAME}/artifacts
-        mc mb myminio/test-bucket
+    command: >
+      mc alias set myminio http://s3:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+      mc admin user svcacct add --access-key ${MLFLOW_AWS_ACCESS_KEY_ID} --secret-key ${MLFLOW_AWS_SECRET_ACCESS_KEY} myminio ${MINIO_ROOT_USER} &&
+      mc mb --ignore-existing myminio/${MLFLOW_BUCKET_NAME}/artifacts &&
+      mc mb --ignore-existing myminio/test-bucket
 
   mlflow_server:
     restart: always
@@ -65,8 +65,10 @@ services:
     image: mlflow_server
     container_name: mlflow_server
     depends_on:
-      - db
-      - s3_setup
+      db:
+        condition: service_healthy
+      s3_setup:
+        condition: service_started
     ports:
       - "5050:5000"
     networks:
@@ -83,13 +85,13 @@ services:
       --host 0.0.0.0
       --serve-artifacts
       --artifacts-destination s3://${MLFLOW_BUCKET_NAME}/artifacts
-      --allowed-hosts "178.72.151.49,localhost,127.0.0.1,0.0.0.0,mlflow_server,178.72.151.49:5050"
-      --cors-allowed-origins "http://178.72.151.49:5050,http://localhost:5050,http://127.0.0.1:5050"
+      --allowed-hosts "*"
+      --cors-allowed-origins "*"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
-      interval: 30s
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/"]
+      interval: 20s
       timeout: 10s
-      retries: 3
+      retries: 5
 
 networks:
   frontend:
