@@ -84,7 +84,7 @@ services:
       --serve-artifacts
       --artifacts-destination s3://${MLFLOW_BUCKET_NAME}/artifacts
       --allowed-hosts "178.72.151.49,localhost,127.0.0.1,0.0.0.0,mlflow_server,178.72.151.49:5050"
-    --cors-allowed-origins "http://178.72.151.49:5050,http://localhost:5050,http://127.0.0.1:5050"
+      --cors-allowed-origins "http://178.72.151.49:5050,http://localhost:5050,http://127.0.0.1:5050"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]
       interval: 30s
