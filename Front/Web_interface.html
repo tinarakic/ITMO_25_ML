@@ -490,7 +490,7 @@
                         <!-- Код региона -->
                         <div class="form-group">
                             <label for="regionCode" class="required">Код региона</label>
-                            <input type="number" id="regionCode" name="regionCode" min="0" placeholder="Введите код региона" required>
+                            <input type="number" id="regionCode" name="regionCode" min="0" max="52" placeholder="Введите код региона от 0 до 52" required>
                             <div class="error" id="regionCodeError">Пожалуйста, введите неотрицательное целое число</div>
                         </div>
 
@@ -811,7 +811,7 @@
                 isValid = showError('drivingLicenseGroup', 'drivingLicenseError', drivingLicenseValidation.isValid, drivingLicenseValidation.message) && isValid;
                 
                 // Валидация кода региона
-                const regionCodeValidation = validateInteger(document.getElementById('regionCode'), 0);
+                const regionCodeValidation = validateInteger(document.getElementById('regionCode'), 0, 52);
                 isValid = showError('regionCode', 'regionCodeError', regionCodeValidation.isValid, regionCodeValidation.message) && isValid;
                 
                 // Валидация страховки на транспорт
@@ -986,7 +986,7 @@
                     const validation = validateInteger(target, 0, 85);
                     showError('age', 'ageError', validation.isValid, validation.message);
                 } else if (target.id === 'regionCode') {
-                    const validation = validateInteger(target, 0);
+                    const validation = validateInteger(target, 0, 52);
                     showError('regionCode', 'regionCodeError', validation.isValid, validation.message);
                 } else if (target.id === 'vehicleAge') {
                     const validation = validateInteger(target, 0);
@@ -1033,4 +1033,5 @@
     </script>
 </body>
 </html>
+
 
