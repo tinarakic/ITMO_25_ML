@@ -841,43 +841,6 @@
                 return isValid;
             }
 
-            // Имитация отправки данных на бекенд
-            function simulateBackendRequest(formData) {
-                return new Promise((resolve) => {
-                    // Имитация задержки сети
-                    setTimeout(() => {
-                        // Генерация случайной вероятности для демонстрации
-                        let probability = 50;
-                        
-                        // Простые "правила" для демонстрации влияния разных факторов
-                        const age = parseInt(formData.get('age'));
-                        if (age > 40 && age < 60) probability += 10;
-                        if (age > 60) probability -= 15;
-                        
-                        if (formData.get('gender') === 'Женщина') probability += 5;
-                        
-                        if (formData.get('drivingLicense') === '1') probability += 15;
-                        
-                        if (formData.get('previouslyInsured') === '1') probability += 20;
-                        
-                        if (formData.get('vehicleDamage') === '1') probability += 10;
-                        
-                        const vehicleAge = parseInt(formData.get('vehicleAge'));
-                        if (vehicleAge < 5) probability += 10;
-                        
-                        // Нормализация вероятности в пределах 0-100%
-                        probability = Math.max(0, Math.min(100, probability));
-                        
-                        // Имитация ответа от бекенда
-                        resolve({
-                            success: true,
-                            probability: probability,
-                            message: "Расчет выполнен успешно"
-                        });
-                    }, 1500);
-                });
-            }
-
             // Обновление результата расчета
             function updateResult(probability) {
                 // Показать секцию с результатом
@@ -910,6 +873,12 @@
                 } else {
                     description = 'Очень высокая вероятность оформления страховки. Клиент, скорее всего, оформит страховку.';
                 }
+
+                // if (probability < 69) {
+                //     description = 'Низкая вероятность оформления страховки. Рекомендуется предложить дополнительные условия.';
+                // } else {
+                //     description = 'Высокая вероятность оформления страховки. Клиент явно заинтересован.';
+                // }
                 
                 probabilityDescription.textContent = description;
             }
@@ -943,19 +912,37 @@
                     Policy_Sales_Channel: parseInt(formData.get('policySalesChannel')),
                     Vintage: parseInt(formData.get('vintage'))
                 };
-                // - вот тут надо бы апи написать 
+                
+                 const vehicleAgeYears = parseInt(formData.get('vehicleAge'));
+                backendData.Vehicle_Age =
+                  vehicleAgeYears < 1 ? '< 1 Year' :
+                  vehicleAgeYears <= 2 ? '1-2 Year' :
+                  '> 2 Years';
+
+                  backendData.Vehicle_Damage =
+                  (formData.get('vehicleDamage') === '1') ? 'Yes' : 'No';
+                
                 try {
-                    // Имитация запроса к бекенду
-                    const response = await simulateBackendRequest(formData);
-                    
-                    if (response.success) {
-                        updateResult(response.probability);
-                    } else {
-                        alert('Ошибка при расчете вероятности: ' + response.message);
-                    }
+                     const params = new URLSearchParams(backendData).toString();
+                     const response = await fetch(
+                         `/api/predict?${params}`,
+                  {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                  }
+                );
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Ошибка сервера');
+                }
+            
+                const result = await response.json();
+            
+                updateResult(Math.round(result.probability * 100));
                 } catch (error) {
                     console.error('Ошибка:', error);
-                    alert('Произошла ошибка при подключении к серверу. Пожалуйста, попробуйте позже.');
+                    alert('Ошибка при обращении к API: ' + error.message);
                 } finally {
                     // Скрыть состояние загрузки
                     calculateBtn.disabled = false;
@@ -1046,3 +1033,4 @@
     </script>
 </body>
 </html>
+
