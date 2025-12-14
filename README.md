@@ -50,8 +50,8 @@ main/
 │
 ├── docker/
 │   ├── jupyter-dockerfiles/                
-│   │   └── Dockerfile-cpu       # Docker файл, позвояющий подять командный Jupyter
-│   ├── mlflow-server/           # Docker файл, позвояющий подять командный MLFlow для взаимодействия при выборе модели
+│   │   └── Dockerfile-cpu       # Docker файл, позвояющий поднять командный Jupyter
+│   ├── mlflow-server/           # Docker файл, позвояющий поднять командный MLFlow для взаимодействия при выборе модели
 │   │    └── Dockerfile-cpu
 │   ├── docker-compose-cpu.yaml  # Docker-compose для Jupyter
 │   └── docker-compose.yaml      # Docker-compose для MlFlow
