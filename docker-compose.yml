@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+
+  front:
+    build: ./front
+    ports:
+      - "5701:80"
+    depends_on:
+      - api
