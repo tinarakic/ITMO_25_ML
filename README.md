@@ -64,17 +64,17 @@ main/
 │   └── ML_project_Tina.ipynb    
 │
 ├── model/
-│   └── catboost_pipeline.pkl      # Сохранённая ML-модель, вместе с предобработкой данных
+│   └── catboost_pipeline.pkl     # Сохранённая ML-модель, вместе с предобработкой данных
 │
 ├── backend/
-│   ├── app.py                     # API (FastAPI)
-│   ├── preprocess_catboost.py     # Class для предобрабоки данных
-│   ├── test_script.py             # Скрипт для тестирования API + модели на тестовом наборе данных
-│   ├── api_documentation.md       # Документация к API
+│   ├── app.py                    # API (FastAPI)
+│   ├── preprocess_catboost.py    # Class для предобрабоки данных
+│   ├── test_script.py            # Скрипт для тестирования API + модели на тестовом наборе данных
+│   ├── api_documentation.md      # Документация к API
 │   └── requirements.txt
 │
 ├── frontend/
-│   ├── index.html          # Веб-интерфейс
+│   ├── index.html                # Веб-интерфейс
 │   ├── style.css
 │   └── script.js
 │
@@ -108,6 +108,7 @@ main/
 4. F1
 5. ROC-AUC
 В качетсве итоговой модели была выбранна модель с наибольшим `F1-score`.
+
 С результатми эскеприментов можно ознакомиться по [ссылке](http://178.72.151.49:5050/).
 
 ## ▶ Запуск проекта
