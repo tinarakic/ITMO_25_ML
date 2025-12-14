@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор вероятности оформления страховки</title>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --card-bg: white;
+            --header-bg: linear-gradient(135deg, #10b981, #047857);
+            --header-color: white;
+            --border-color: #d1d5db;
+            --input-bg: white;
+            --input-border: #d1d5db;
+            --input-focus-border: #10b981;
+            --input-focus-shadow: rgba(16, 185, 129, 0.2);
+            --radio-bg: white;
+            --error-color: #ef4444;
+            --btn-bg: #059669;
+            --btn-hover: #047857;
+            --btn-disabled: #d1d5db;
+            --result-color: #10b981;
+            --decryption-bg: #ecfdf5;
+            --decryption-border: #a7f3d0;
+            --toggle-bg: #ecfdf5;
+            --footer-color: #374151;
+            --footer-border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 0.5rem;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a2e;
+            --text-color: #e6e6e6;
+            --card-bg: #16213e;
+            --header-bg: linear-gradient(135deg, #0f3460, #1a1a2e);
+            --header-color: #e6e6e6;
+            --border-color: #394867;
+            --input-bg: #0f3460;
+            --input-border: #394867;
+            --input-focus-border: #4cc9f0;
+            --input-focus-shadow: rgba(76, 201, 240, 0.2);
+            --radio-bg: #0f3460;
+            --error-color: #f05454;
+            --btn-bg: #4cc9f0;
+            --btn-hover: #3aa8d8;
+            --btn-disabled: #394867;
+            --result-color: #4cc9f0;
+            --decryption-bg: #0f3460;
+            --decryption-border: #394867;
+            --toggle-bg: #0f3460;
+            --footer-color: #b0b0b0;
+            --footer-border: #394867;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 1rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .theme-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+        }
+
+        .theme-btn {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s;
+        }
+
+        .theme-btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .theme-btn .icon {
+            font-size: 1.2rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-bottom: 2rem;
+            background: var(--header-bg);
+            color: var(--header-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            transition: background-color 0.3s;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--result-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--error-color);
+        }
+
+        input, select, .radio-group {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--input-border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px var(--input-focus-shadow);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem;
+            background-color: var(--radio-bg);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-option input {
+            width: auto;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+            transition: color 0.3s;
+        }
+
+        .has-error input, .has-error select, .has-error .radio-group {
+            border-color: var(--error-color);
+        }
+
+        .has-error .error {
+            display: block;
+        }
+
+        .btn-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background-color: var(--btn-disabled);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid white;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .code-decryption {
+            margin-top: 1rem;
+        }
+
+        .decryption-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--toggle-bg);
+            border: 1px solid var(--decryption-border);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .decryption-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .decryption-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border: 1px solid var(--decryption-border);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        .decryption-content.active {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .decryption-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .code-item {
+            padding: 0.5rem;
+            background-color: var(--card-bg);
+            border-radius: 0.25rem;
+            border-left: 3px solid var(--result-color);
+            transition: background-color 0.3s;
+        }
+
+        .code-value {
+            font-weight: 600;
+            color: var(--result-color);
+            transition: color 0.3s;
+        }
+
+        .code-desc {
+            font-size: 0.875rem;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .result-section {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            display: none;
+            transition: background-color 0.3s;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .probability-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--result-color);
+            margin: 1rem 0;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.5s, transform 0.5s, color 0.3s;
+        }
+
+        .probability-value.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .probability-description {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            padding: 0 1rem;
+            transition: color 0.3s;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: var(--footer-color);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--footer-border);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .form-section {
+                padding: 1.5rem;
+            }
+            
+            .probability-value {
+                font-size: 3rem;
+            }
+            
+            .btn {
+                max-width: 100%;
+            }
+            
+            .theme-switcher {
+                position: static;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            
+            .theme-btn {
+                display: inline-flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="theme-switcher">
+            <button class="theme-btn" id="themeToggle">
+                <span class="icon">🌙</span>
+                <span>Ночной режим</span>
+            </button>
+        </div>
+
+        <header>
+            <h1>Калькулятор вероятности оформления страховки</h1>
+            <p class="subtitle">Введите данные клиента для расчета вероятности оформления страховки</p>
+        </header>
+
+        <main>
+            <section class="form-section">
+                <h2>Данные клиента</h2>
+                <form id="insuranceForm">
+                    <div class="form-grid">
+                        <!-- Возраст -->
+                        <div class="form-group">
+                            <label for="age" class="required">Возраст (лет)</label>
+                            <input type="number" id="age" name="age" min="0" max="85" placeholder="Введите возраст от 0 до 85" required>
+                            <div class="error" id="ageError">Пожалуйста, введите возраст от 0 до 85 лет</div>
+                        </div>
+
+                        <!-- Пол -->
+                        <div class="form-group">
+                            <label class="required">Пол</label>
+                            <div class="radio-group" id="genderGroup">
+                                <div class="radio-option">
+                                    <input type="radio" id="male" name="gender" value="Мужчина" required>
+                                    <label for="male">Мужчина</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="female" name="gender" value="Женщина">
+                                    <label for="female">Женщина</label>
+                                </div>
+                            </div>
+                            <div class="error" id="genderError">Пожалуйста, выберите пол</div>
+                        </div>
+
+                        <!-- Наличие водительских прав -->
+                        <div class="form-group">
+                            <label class="required">Наличие водительских прав</label>
+                            <div class="radio-group" id="drivingLicenseGroup">
+                                <div class="radio-option">
+                                    <input type="radio" id="licenseYes" name="drivingLicense" value="1" required>
+                                    <label for="licenseYes">Да</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="licenseNo" name="drivingLicense" value="0">
+                                    <label for="licenseNo">Нет</label>
+                                </div>
+                            </div>
+                            <div class="error" id="drivingLicenseError">Пожалуйста, укажите наличие водительских прав</div>
+                        </div>
+
+                        <!-- Код региона -->
+                        <div class="form-group">
+                            <label for="regionCode" class="required">Код региона</label>
+                            <input type="number" id="regionCode" name="regionCode" min="0" placeholder="Введите код региона" required>
+                            <div class="error" id="regionCodeError">Пожалуйста, введите неотрицательное целое число</div>
+                        </div>
+
+                        <!-- Страховка на транспортное средство -->
+                        <div class="form-group">
+                            <label class="required">Страховка на транспортное средство</label>
+                            <div class="radio-group" id="previouslyInsuredGroup">
+                                <div class="radio-option">
+                                    <input type="radio" id="insuredYes" name="previouslyInsured" value="1" required>
+                                    <label for="insuredYes">Да</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="insuredNo" name="previouslyInsured" value="0">
+                                    <label for="insuredNo">Нет</label>
+                                </div>
+                            </div>
+                            <div class="error" id="previouslyInsuredError">Пожалуйста, укажите наличие страховки на транспортное средство</div>
+                        </div>
+
+                        <!-- Возраст транспорта -->
+                        <div class="form-group">
+                            <label for="vehicleAge" class="required">Возраст транспорта (лет)</label>
+                            <input type="number" id="vehicleAge" name="vehicleAge" min="0" placeholder="Введите возраст транспорта" required>
+                            <div class="error" id="vehicleAgeError">Пожалуйста, введите неотрицательное целое число</div>
+                        </div>
+
+                        <!-- Получение повреждений автомобиля -->
+                        <div class="form-group">
+                            <label class="required">Получение повреждений автомобиля</label>
+                            <div class="radio-group" id="vehicleDamageGroup">
+                                <div class="radio-option">
+                                    <input type="radio" id="damageYes" name="vehicleDamage" value="1" required>
+                                    <label for="damageYes">Да</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="damageNo" name="vehicleDamage" value="0">
+                                    <label for="damageNo">Нет</label>
+                                </div>
+                            </div>
+                            <div class="error" id="vehicleDamageError">Пожалуйста, укажите факт получения повреждений автомобиля</div>
+                        </div>
+
+                        <!-- Страховой взнос -->
+                        <div class="form-group">
+                            <label for="annualPremium" class="required">Страховой взнос</label>
+                            <input type="text" id="annualPremium" name="annualPremium" placeholder="Введите страховой взнос" required>
+                            <div class="error" id="annualPremiumError">Пожалуйста, введите неотрицательное число</div>
+                        </div>
+
+                        <!-- Взаимодействие с клиентом -->
+                        <div class="form-group">
+                            <label for="policySalesChannel" class="required">Код взаимодействия с клиентом</label>
+                            <input type="number" id="policySalesChannel" name="policySalesChannel" placeholder="Введите код от 1 до 163" required>
+                            <div class="error" id="policySalesChannelError">Пожалуйста, введите допустимый код взаимодействия</div>
+                            
+                            <!-- Расшифровка кодов -->
+                            <div class="code-decryption">
+                                <div class="decryption-toggle" id="decryptionToggle">
+                                    <span>Расшифровка кода взаимодействия</span>
+                                    <span id="toggleIcon">▼</span>
+                                </div>
+                                <div class="decryption-content" id="decryptionContent">
+                                    <div class="decryption-grid" id="decryptionGrid">
+                                        <!-- Коды будут добавлены через JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Количество дней -->
+                        <div class="form-group">
+                            <label for="vintage" class="required">Количество дней</label>
+                            <input type="number" id="vintage" name="vintage" min="0" placeholder="Введите количество дней" required>
+                            <div class="error" id="vintageError">Пожалуйста, введите неотрицательное целое число</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="submit" class="btn" id="calculateBtn">Рассчитать вероятность</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="result-section" id="resultSection">
+                <h2>Результат расчета</h2>
+                <div class="result-container">
+                    <p>Вероятность оформления страховоки в нашей компании:</p>
+                    <div class="probability-value" id="probabilityValue">0%</div>
+                    <p class="probability-description" id="probabilityDescription">
+                        Введите данные клиента и нажмите "Рассчитать вероятность"
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>© 2025 Калькулятор вероятности оформления страховки. Все права защищены).</p>
+            <p>Подготовила команда 4, хи-хик.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Константы для кодов взаимодействия
+            const EXCLUDED_CODES = [72, 77, 84, 85, 141, 142, 143, 144, 149, 161, 162];
+            const HISTORICAL_FIGURES = [
+                "Юлий Цезарь", "Клеопатра VII", "Наполеон Бонапарт", "Екатерина Великая", 
+                "Александр Македонский", "Жанна д'Арк", "Леонардо да Винчи", "Уинстон Черчилль", 
+                "Альберт Эйнштейн", "Королева Виктория", "Чингисхан", "Мария Кюри", 
+                "Петр I", "Авраам Линкольн", "Марк Твен", "Фрида Кало", "Исаак Ньютон", 
+                "Индира Ганди", "Микеланджело", "Коко Шанель", "Аристотель", "Амелия Эрхарт", 
+                "Стив Джобс", "Маргарет Тэтчер", "Чарли Чаплин", "Галилео Галилей", 
+                "Мартин Лютер Кинг", "Нельсон Мандела", "Джордж Вашингтон", "Теодор Рузвельт", 
+                "Мэрилин Монро", "Эрнесто Че Гевара", "Махатма Ганди", "Элеонора Рузвельт", 
+                "Сократ", "Никколо Макиавелли", "Вольфганг Амадей Моцарт", "Людвиг ван Бетховен"
+            ];
+            const INTERACTION_TYPES = {
+                "Л": "личная встреча",
+                "Т": "телефонный разговор", 
+                "П": "электронная почта",
+                "Ч": "чат в мессенджере"
+            };
+
+            // Элементы DOM
+            const form = document.getElementById('insuranceForm');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const probabilityValue = document.getElementById('probabilityValue');
+            const probabilityDescription = document.getElementById('probabilityDescription');
+            const policySalesChannelInput = document.getElementById('policySalesChannel');
+            const decryptionToggle = document.getElementById('decryptionToggle');
+            const decryptionContent = document.getElementById('decryptionContent');
+            const decryptionGrid = document.getElementById('decryptionGrid');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const resultSection = document.getElementById('resultSection');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('.icon');
+
+            // Переменная для хранения состояния темы
+            let isDarkMode = false;
+
+            // Переключение темы
+            function toggleTheme() {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                
+                if (isDarkMode) {
+                    themeIcon.textContent = '☀️';
+                    themeToggle.querySelector('span:last-child').textContent = 'Дневной режим';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    themeIcon.textContent = '🌙';
+                    themeToggle.querySelector('span:last-child').textContent = 'Ночной режим';
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+
+            // Инициализация темы из localStorage
+            function initTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    isDarkMode = true;
+                    document.body.classList.add('dark-mode');
+                    themeIcon.textContent = '☀️';
+                    themeToggle.querySelector('span:last-child').textContent = 'Дневной режим';
+                }
+            }
+
+            // Генерация допустимых кодов взаимодействия (1-163, кроме исключенных)
+            function generateValidCodes() {
+                const codes = [];
+                for (let i = 1; i <= 163; i++) {
+                    if (!EXCLUDED_CODES.includes(i)) {
+                        codes.push(i);
+                    }
+                }
+                return codes;
+            }
+
+            // Генерация расшифровки кодов
+            function generateDecryptionCodes() {
+                const validCodes = generateValidCodes();
+                const interactionKeys = Object.keys(INTERACTION_TYPES);
+                
+                validCodes.forEach((code, index) => {
+                    const figureIndex = index % HISTORICAL_FIGURES.length;
+                    const interactionIndex = index % interactionKeys.length;
+                    
+                    const figure = HISTORICAL_FIGURES[figureIndex];
+                    const interactionKey = interactionKeys[interactionIndex];
+                    const interaction = INTERACTION_TYPES[interactionKey];
+                    
+                    const codeItem = document.createElement('div');
+                    codeItem.className = 'code-item';
+                    codeItem.innerHTML = `
+                        <div class="code-value">Код ${code}</div>
+                        <div class="code-desc">${figure} (${interactionKey} - ${interaction})</div>
+                    `;
+                    
+                    decryptionGrid.appendChild(codeItem);
+                });
+            }
+
+            // Форматирование числа с разделителями тысяч
+            function formatNumberWithSpaces(value) {
+                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+
+            // Форматирование страхового взноса при вводе
+            function formatPremiumInput(input) {
+                // Удаляем все символы, кроме цифр и точки
+                let value = input.value.replace(/[^\d.]/g, '');
+                
+                // Удаляем лишние точки
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                
+                // Форматируем целую часть
+                const numberValue = parseFloat(value) || 0;
+                input.value = formatNumberWithSpaces(Math.floor(numberValue)) + (value.includes('.') ? '.' + parts[parts.length - 1] : '');
+            }
+
+            // Валидация целых чисел
+            function validateInteger(input, min = null, max = null) {
+                const value = input.value.trim();
+                const intValue = parseInt(value);
+                
+                if (value === '' || isNaN(intValue) || !Number.isInteger(parseFloat(value))) {
+                    return { isValid: false, message: 'Пожалуйста, введите целое число' };
+                }
+                
+                if (min !== null && intValue < min) {
+                    return { isValid: false, message: `Значение должно быть не менее ${min}` };
+                }
+                
+                if (max !== null && intValue > max) {
+                    return { isValid: false, message: `Значение должно быть не более ${max}` };
+                }
+                
+                return { isValid: true };
+            }
+
+            // Валидация числа с плавающей точкой
+            function validateFloat(input, min = null) {
+                const value = input.value.trim().replace(/\s/g, '');
+                const floatValue = parseFloat(value);
+                
+                if (value === '' || isNaN(floatValue)) {
+                    return { isValid: false, message: 'Пожалуйста, введите число' };
+                }
+                
+                if (min !== null && floatValue < min) {
+                    return { isValid: false, message: `Значение должно быть не менее ${min}` };
+                }
+                
+                return { isValid: true };
+            }
+
+            // Валидация выбора из radio-кнопок
+            function validateRadioGroup(groupName) {
+                const selected = form.querySelector(`input[name="${groupName}"]:checked`);
+                return { isValid: !!selected, message: 'Пожалуйста, выберите один из вариантов' };
+            }
+
+            // Валидация кода взаимодействия
+            function validatePolicySalesChannel(input) {
+                const value = input.value.trim();
+                const intValue = parseInt(value);
+                const validCodes = generateValidCodes();
+                
+                if (value === '' || isNaN(intValue) || !Number.isInteger(parseFloat(value))) {
+                    return { isValid: false, message: 'Пожалуйста, введите целое число' };
+                }
+                
+                if (intValue < 1 || intValue > 163) {
+                    return { isValid: false, message: 'Код должен быть в диапазоне от 1 до 163' };
+                }
+                
+                if (!validCodes.includes(intValue)) {
+                    return { isValid: false, message: 'Этот код недопустим. Используйте расшифровку для списка допустимых кодов' };
+                }
+                
+                return { isValid: true };
+            }
+
+            // Показ/скрытие ошибки
+            function showError(inputId, errorId, isValid, message = '') {
+                const input = document.getElementById(inputId);
+                const error = document.getElementById(errorId);
+                const formGroup = input.closest('.form-group');
+                
+                if (!isValid) {
+                    formGroup.classList.add('has-error');
+                    error.textContent = message;
+                } else {
+                    formGroup.classList.remove('has-error');
+                    error.textContent = '';
+                }
+                
+                return isValid;
+            }
+
+            // Валидация всей формы
+            function validateForm() {
+                let isValid = true;
+                
+                // Валидация возраста
+                const ageValidation = validateInteger(document.getElementById('age'), 0, 85);
+                isValid = showError('age', 'ageError', ageValidation.isValid, ageValidation.message) && isValid;
+                
+                // Валидация пола
+                const genderValidation = validateRadioGroup('gender');
+                isValid = showError('genderGroup', 'genderError', genderValidation.isValid, genderValidation.message) && isValid;
+                
+                // Валидация водительских прав
+                const drivingLicenseValidation = validateRadioGroup('drivingLicense');
+                isValid = showError('drivingLicenseGroup', 'drivingLicenseError', drivingLicenseValidation.isValid, drivingLicenseValidation.message) && isValid;
+                
+                // Валидация кода региона
+                const regionCodeValidation = validateInteger(document.getElementById('regionCode'), 0);
+                isValid = showError('regionCode', 'regionCodeError', regionCodeValidation.isValid, regionCodeValidation.message) && isValid;
+                
+                // Валидация страховки на транспорт
+                const previouslyInsuredValidation = validateRadioGroup('previouslyInsured');
+                isValid = showError('previouslyInsuredGroup', 'previouslyInsuredError', previouslyInsuredValidation.isValid, previouslyInsuredValidation.message) && isValid;
+                
+                // Валидация возраста транспорта
+                const vehicleAgeValidation = validateInteger(document.getElementById('vehicleAge'), 0);
+                isValid = showError('vehicleAge', 'vehicleAgeError', vehicleAgeValidation.isValid, vehicleAgeValidation.message) && isValid;
+                
+                // Валидация повреждений автомобиля
+                const vehicleDamageValidation = validateRadioGroup('vehicleDamage');
+                isValid = showError('vehicleDamageGroup', 'vehicleDamageError', vehicleDamageValidation.isValid, vehicleDamageValidation.message) && isValid;
+                
+                // Валидация страхового взноса
+                const annualPremiumValidation = validateFloat(document.getElementById('annualPremium'), 0);
+                isValid = showError('annualPremium', 'annualPremiumError', annualPremiumValidation.isValid, annualPremiumValidation.message) && isValid;
+                
+                // Валидация кода взаимодействия
+                const policySalesChannelValidation = validatePolicySalesChannel(policySalesChannelInput);
+                isValid = showError('policySalesChannel', 'policySalesChannelError', policySalesChannelValidation.isValid, policySalesChannelValidation.message) && isValid;
+                
+                // Валидация количества дней
+                const vintageValidation = validateInteger(document.getElementById('vintage'), 0);
+                isValid = showError('vintage', 'vintageError', vintageValidation.isValid, vintageValidation.message) && isValid;
+                
+                return isValid;
+            }
+
+            // Имитация отправки данных на бекенд
+            function simulateBackendRequest(formData) {
+                return new Promise((resolve) => {
+                    // Имитация задержки сети
+                    setTimeout(() => {
+                        // Генерация случайной вероятности для демонстрации
+                        let probability = 50;
+                        
+                        // Простые "правила" для демонстрации влияния разных факторов
+                        const age = parseInt(formData.get('age'));
+                        if (age > 40 && age < 60) probability += 10;
+                        if (age > 60) probability -= 15;
+                        
+                        if (formData.get('gender') === 'Женщина') probability += 5;
+                        
+                        if (formData.get('drivingLicense') === '1') probability += 15;
+                        
+                        if (formData.get('previouslyInsured') === '1') probability += 20;
+                        
+                        if (formData.get('vehicleDamage') === '1') probability += 10;
+                        
+                        const vehicleAge = parseInt(formData.get('vehicleAge'));
+                        if (vehicleAge < 5) probability += 10;
+                        
+                        // Нормализация вероятности в пределах 0-100%
+                        probability = Math.max(0, Math.min(100, probability));
+                        
+                        // Имитация ответа от бекенда
+                        resolve({
+                            success: true,
+                            probability: probability,
+                            message: "Расчет выполнен успешно"
+                        });
+                    }, 1500);
+                });
+            }
+
+            // Обновление результата расчета
+            function updateResult(probability) {
+                // Показать секцию с результатом
+                resultSection.classList.add('show');
+                
+                // Прокрутить к результату
+                setTimeout(() => {
+                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                // Обновить значение вероятности
+                probabilityValue.textContent = `${probability}%`;
+                probabilityValue.classList.remove('show');
+                
+                // Анимация появления
+                setTimeout(() => {
+                    probabilityValue.classList.add('show');
+                }, 50);
+                
+                // Текстовое описание на основе вероятности
+                let description = '';
+                if (probability < 20) {
+                    description = 'Низкая вероятность оформления страховки. Рекомендуется предложить дополнительные условия.';
+                } else if (probability < 40) {
+                    description = 'Умеренная вероятность оформления страховки. Возможно, потребуется дополнительная работа с клиентом.';
+                } else if (probability < 60) {
+                    description = 'Средняя вероятность оформления страховки. Клиент может быть заинтересован при правильном подходе.';
+                } else if (probability < 80) {
+                    description = 'Высокая вероятность оформления страховки. Клиент явно заинтересован.';
+                } else {
+                    description = 'Очень высокая вероятность оформления страховки. Клиент, скорее всего, оформит страховку.';
+                }
+                
+                probabilityDescription.textContent = description;
+            }
+
+            // Обработка отправки формы
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!validateForm()) {
+                    return;
+                }
+                
+                // Показать состояние загрузки
+                calculateBtn.disabled = true;
+                calculateBtn.classList.add('loading');
+                calculateBtn.textContent = 'Расчет...';
+                
+                // Сбор данных формы
+                const formData = new FormData(form);
+                
+                // Преобразование данных для бекенда
+                const backendData = {
+                    Age: parseInt(formData.get('age')),
+                    Gender: formData.get('gender') === 'Мужчина' ? 'Male' : 'Female',
+                    Driving_License: parseInt(formData.get('drivingLicense')),
+                    Region_Code: parseInt(formData.get('regionCode')),
+                    Previously_Insured: parseInt(formData.get('previouslyInsured')),
+                    Vehicle_Age: parseInt(formData.get('vehicleAge')),
+                    Vehicle_Damage: parseInt(formData.get('vehicleDamage')),
+                    Annual_Premium: parseFloat(formData.get('annualPremium').replace(/\s/g, '')),
+                    Policy_Sales_Channel: parseInt(formData.get('policySalesChannel')),
+                    Vintage: parseInt(formData.get('vintage'))
+                };
+                // - вот тут надо бы апи написать 
+                try {
+                    // Имитация запроса к бекенду
+                    const response = await simulateBackendRequest(formData);
+                    
+                    if (response.success) {
+                        updateResult(response.probability);
+                    } else {
+                        alert('Ошибка при расчете вероятности: ' + response.message);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при подключении к серверу. Пожалуйста, попробуйте позже.');
+                } finally {
+                    // Скрыть состояние загрузки
+                    calculateBtn.disabled = false;
+                    calculateBtn.classList.remove('loading');
+                    calculateBtn.textContent = 'Рассчитать вероятность';
+                }
+            });
+
+            // Обработчик для форматирования страхового взноса
+            const annualPremiumInput = document.getElementById('annualPremium');
+            annualPremiumInput.addEventListener('input', function() {
+                formatPremiumInput(this);
+            });
+
+            // Обработчик для показа/скрытия расшифровки кодов
+            decryptionToggle.addEventListener('click', function() {
+                decryptionContent.classList.toggle('active');
+                toggleIcon.textContent = decryptionContent.classList.contains('active') ? '▲' : '▼';
+            });
+
+            // Валидация полей при изменении
+            form.addEventListener('input', function(e) {
+                const target = e.target;
+                
+                // Для радио-кнопок валидируем всю группу
+                if (target.type === 'radio') {
+                    const groupName = target.name;
+                    if (groupName === 'gender') {
+                        showError('genderGroup', 'genderError', true);
+                    } else if (groupName === 'drivingLicense') {
+                        showError('drivingLicenseGroup', 'drivingLicenseError', true);
+                    } else if (groupName === 'previouslyInsured') {
+                        showError('previouslyInsuredGroup', 'previouslyInsuredError', true);
+                    } else if (groupName === 'vehicleDamage') {
+                        showError('vehicleDamageGroup', 'vehicleDamageError', true);
+                    }
+                }
+                
+                // Для остальных полей валидируем конкретное поле
+                else if (target.id === 'age') {
+                    const validation = validateInteger(target, 0, 85);
+                    showError('age', 'ageError', validation.isValid, validation.message);
+                } else if (target.id === 'regionCode') {
+                    const validation = validateInteger(target, 0);
+                    showError('regionCode', 'regionCodeError', validation.isValid, validation.message);
+                } else if (target.id === 'vehicleAge') {
+                    const validation = validateInteger(target, 0);
+                    showError('vehicleAge', 'vehicleAgeError', validation.isValid, validation.message);
+                } else if (target.id === 'annualPremium') {
+                    formatPremiumInput(target);
+                    const validation = validateFloat(target, 0);
+                    showError('annualPremium', 'annualPremiumError', validation.isValid, validation.message);
+                } else if (target.id === 'vintage') {
+                    const validation = validateInteger(target, 0);
+                    showError('vintage', 'vintageError', validation.isValid, validation.message);
+                } else if (target.id === 'policySalesChannel') {
+                    const validation = validatePolicySalesChannel(target);
+                    showError('policySalesChannel', 'policySalesChannelError', validation.isValid, validation.message);
+                }
+            });
+
+            // Обработчик переключения темы
+            themeToggle.addEventListener('click', toggleTheme);
+
+            // Инициализация
+            initTheme();
+            generateDecryptionCodes();
+            
+            // Запрет ввода нечисловых значений в числовые поля
+            const numberInputs = document.querySelectorAll('input[type="number"]');
+            numberInputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    // Разрешаем только цифры, Backspace, Tab, стрелки
+                    if (!/\d/.test(e.key) && 
+                        !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'].includes(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            // Особый обработчик для поля кода взаимодействия - разрешаем ввод и удаление
+            policySalesChannelInput.addEventListener('input', function(e) {
+                // Разрешаем любой ввод, валидация произойдет при отправке формы
+                // Очищаем ошибку при начале ввода
+                showError('policySalesChannel', 'policySalesChannelError', true);
+            });
+        });
+    </script>
+</body>
+</html>
