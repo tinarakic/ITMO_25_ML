@@ -25,7 +25,7 @@ Previously_Insuredint(0 or 1),
 Vehicle_Age=str("< 1 Year" or "1-2 Year" or "> 2 Years"),
 Vehicle_Damage=str("Yes" or "No"),
 Annual_Premium=int(0 or greater),
-Policy_Sales_Channe=int(from 0 to 163),
+Policy_Sales_Channel=int(from 0 to 163),
 Vintage=int(0 or greater),,
 ```
 
